@@ -13,11 +13,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Extract KaziCash Android project
+        run: |
+          unzip -q KaziCash_GitHub_APK_Project.zip -d kazicash-build
+
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK 35
+        run: |
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -25,10 +36,10 @@ jobs:
           gradle-version: '8.9'
 
       - name: Build debug APK
-        run: gradle assembleDebug --stacktrace
+        run: gradle -p kazicash-build assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: KaziCash-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          path: kazicash-build/app/build/outputs/apk/debug/app-debug.apk
